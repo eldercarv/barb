@@ -1,0 +1,83 @@
+{
+  "project_info": {
+    "project_number": "741352721927",
+    "firebase_url": "https://barbearia-f05f6-default-rtdb.firebaseio.com",
+    "project_id": "barbearia-f05f6",
+    "storage_bucket": "barbearia-f05f6.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:741352721927:android:acbdaf8fbb17711a53a4a2",
+        "android_client_info": {
+          "package_name": "Barbearia598.Teste.Ad"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "741352721927-m5uj2dbedhl5nlm2bj5p2e3nr6rjr0k0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB0xxjA-5HnHVJtvJ4Hq8lIpYO8o5MsA_A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "741352721927-m5uj2dbedhl5nlm2bj5p2e3nr6rjr0k0.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "741352721927-aqv944ajfbetvtgtaoe3itro5pc37mf5.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.barbearia"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:741352721927:android:52a7b79d802e2c3253a4a2",
+        "android_client_info": {
+          "package_name": "com.example.barbearia"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "741352721927-m5uj2dbedhl5nlm2bj5p2e3nr6rjr0k0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB0xxjA-5HnHVJtvJ4Hq8lIpYO8o5MsA_A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "741352721927-m5uj2dbedhl5nlm2bj5p2e3nr6rjr0k0.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "741352721927-aqv944ajfbetvtgtaoe3itro5pc37mf5.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.barbearia"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
