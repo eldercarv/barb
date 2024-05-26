@@ -1,15 +1,16 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'database_helper.dart';
+import 'package:uuid/uuid.dart';
 
 class BarberShop {
-  int? id;
+  String id;
   String name;
   String location;
   String openingHours;
   String imageUrl;
 
   BarberShop({
-    this.id,
+    required this.id,
     required this.name,
     required this.location,
     required this.openingHours,
@@ -38,6 +39,8 @@ class BarberShop {
 }
 
 class BarberShopRegistrationScreen extends StatefulWidget {
+  const BarberShopRegistrationScreen({super.key});
+
   @override
   _BarberShopRegistrationScreenState createState() =>
       _BarberShopRegistrationScreenState();
@@ -49,45 +52,82 @@ class _BarberShopRegistrationScreenState
   TextEditingController locationController = TextEditingController();
   TextEditingController openingHoursController = TextEditingController();
   TextEditingController imageUrlController = TextEditingController();
+  TextEditingController whatsappController = TextEditingController();
 
   List<BarberShop> barberShops = [];
 
   @override
   void initState() {
     super.initState();
-    _loadBarberShops();
+    // _loadBarberShops();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      DatabaseReference ref = FirebaseDatabase.instance.ref('barbearias');
+
+      ref.onValue.listen((DatabaseEvent event) {
+        final data = event.snapshot.value;
+
+        if (data != null) {
+          var barbersMap = Map<String, dynamic>.from(data as Map);
+
+          final List<BarberShop> barberShops = [];
+
+          barbersMap.forEach((key, value) {
+            final json = Map<String, dynamic>.from(data[key] as Map);
+            barberShops.add(BarberShop.fromMap(json));
+          });
+
+          setState(() {
+            this.barberShops = barberShops;
+          });
+        }
+      });
+    });
   }
 
-  Future<void> _loadBarberShops() async {
-    final dbHelper = DatabaseHelper();
-    try {
-      final data = await dbHelper.getBarberShops();
-      print('Loaded data: $data');
-      setState(() {
-        barberShops = data.map((item) => BarberShop.fromMap(item)).toList();
-      });
-    } catch (error) {
-      print('Error loading barbershops: $error');
-    }
-  }
+  // Future<void> _loadBarberShops() async {
+  // final dbHelper = DatabaseHelper();
+  // dbHelper.initDatabase();
+
+  // try {
+  //   final data = await dbHelper.getBarberShops();
+  //   print('Loaded data: $data');
+  //   setState(() {
+  //     barberShops = data.map((item) => BarberShop.fromMap(item)).toList();
+  //   });
+  // } catch (error) {
+  //   print('Error loading barbershops: $error');
+  // }
+  // }
 
   Future<void> _saveBarberShop() async {
-    final dbHelper = DatabaseHelper();
-    final newBarberShop = BarberShop(
-      name: nameController.text,
-      location: locationController.text,
-      openingHours: openingHoursController.text,
-      imageUrl: imageUrlController.text,
-    );
-
-    print('Saving new barbershop: ${newBarberShop.toMap()}');
     try {
-      await dbHelper.insertBarberShop(newBarberShop.toMap());
-      _loadBarberShops();
+      var uuid = const Uuid();
+      final barberId = uuid.v4();
+
+      final ref = FirebaseDatabase.instance.ref('barbearias/$barberId');
+
+      await ref.set({
+        'id': barberId,
+        'name': nameController.text,
+        'location': locationController.text,
+        'openingHours': openingHoursController.text,
+        'imageUrl': imageUrlController.text,
+        'whatsapp': whatsappController.text,
+      });
+
       nameController.clear();
       locationController.clear();
       openingHoursController.clear();
       imageUrlController.clear();
+      whatsappController.clear();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Barbearia cadastrada com sucesso!'),
+          backgroundColor: Colors.green,
+        ),
+      );
     } catch (error) {
       print('Error saving barbershop: $error');
     }
@@ -99,46 +139,52 @@ class _BarberShopRegistrationScreenState
       title: 'Cadastro de Barbearias',
       home: Scaffold(
         appBar: AppBar(
-          title: Text('Cadastro de Barbearias'),
+          title: const Text('Cadastro de Barbearias'),
         ),
         body: SingleChildScrollView(
-          padding: EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               TextField(
                 controller: nameController,
-                decoration: InputDecoration(labelText: 'Nome da Barbearia'),
+                decoration:
+                    const InputDecoration(labelText: 'Nome da Barbearia'),
               ),
-              SizedBox(height: 16.0),
+              const SizedBox(height: 16.0),
               TextField(
                 controller: locationController,
-                decoration: InputDecoration(labelText: 'Localização'),
+                decoration: const InputDecoration(labelText: 'Localização'),
               ),
-              SizedBox(height: 16.0),
+              const SizedBox(height: 16.0),
               TextField(
                 controller: openingHoursController,
-                decoration:
-                    InputDecoration(labelText: 'Horário de Funcionamento'),
+                decoration: const InputDecoration(
+                    labelText: 'Horário de Funcionamento'),
               ),
-              SizedBox(height: 16.0),
+              const SizedBox(height: 16.0),
               TextField(
                 controller: imageUrlController,
-                decoration: InputDecoration(labelText: 'URL da Imagem'),
+                decoration: const InputDecoration(labelText: 'URL da Imagem'),
               ),
-              SizedBox(height: 16.0),
+              const SizedBox(height: 16.0),
+              TextField(
+                controller: whatsappController,
+                decoration: const InputDecoration(labelText: 'Whatsapp'),
+              ),
+              const SizedBox(height: 16.0),
               ElevatedButton(
                 onPressed: () async {
                   await _saveBarberShop();
                 },
-                child: Text('Cadastrar'),
+                child: const Text('Cadastrar'),
               ),
-              SizedBox(height: 32.0),
-              Text(
+              const SizedBox(height: 32.0),
+              const Text(
                 'Barbearias Cadastradas:',
                 style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
               ),
-              SizedBox(height: 16.0),
+              const SizedBox(height: 16.0),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: barberShops.map((barberShop) {
@@ -161,6 +207,6 @@ class _BarberShopRegistrationScreenState
   }
 }
 
-void main() {
-  runApp(BarberShopRegistrationScreen());
-}
+// void main() {
+//   runApp(BarberShopRegistrationScreen());
+// }

@@ -1,17 +1,13 @@
+import 'package:barbearia/cadastro.dart';
 import 'package:barbearia/main.dart';
-import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:barbearia/Home.dart';
-import 'package:barbearia/loginCadastro.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
-void main() => runApp(const Home());
+// void main() => runApp(const Home());
 
 class Home extends StatelessWidget {
-  const Home({Key? key});
+  const Home({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +19,7 @@ class Home extends StatelessWidget {
 }
 
 class NavigationExample extends StatefulWidget {
-  const NavigationExample({Key? key});
+  const NavigationExample({super.key});
 
   @override
   State<NavigationExample> createState() => _NavigationExampleState();
@@ -32,6 +28,16 @@ class NavigationExample extends StatefulWidget {
 class _NavigationExampleState extends State<NavigationExample> {
   int currentPageIndex = 0;
   bool isProfileSelected = false;
+  List<BarberShop> barberShops = [];
+
+  @override
+  initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _getBarberShops();
+    });
+  }
 
   Future<void> _logout() async {
     try {
@@ -66,12 +72,24 @@ class _NavigationExampleState extends State<NavigationExample> {
           ),
         ],
       ),
-      body: <Widget>[
+      body: [
         Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          const BarberShopRegistrationScreen(),
+                    ),
+                  );
+                },
+                child: const Text('Cadastrar Barbearia'),
+              )
               // Adicione o conteúdo da página inicial aqui
             ],
           ),
@@ -84,11 +102,10 @@ class _NavigationExampleState extends State<NavigationExample> {
                     await _logout();
                     Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(
-                          builder: (context) => Principal()),
+                      MaterialPageRoute(builder: (context) => Principal()),
                     );
                   },
-                  child: Card(
+                  child: const Card(
                     child: ListTile(
                       leading: Icon(Icons.exit_to_app),
                       title: Text('Deslogar'),
@@ -97,35 +114,96 @@ class _NavigationExampleState extends State<NavigationExample> {
                   ),
                 ),
               )
-            : Container(),
+            : Column(
+                children: [
+                  ElevatedButton(
+                    onPressed: () async {
+                      await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              const BarberShopRegistrationScreen(),
+                        ),
+                      );
+                      _getBarberShops();
+                    },
+                    child: const Text('Cadastrar Barbearia'),
+                  ),
+                  const SizedBox(height: 16.0),
+                  const Text(
+                    'Barbearias Cadastradas:',
+                    style:
+                        TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 16.0),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: barberShops.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        final barberShop = barberShops[index];
+                        return ListTile(
+                          leading: CircleAvatar(
+                            backgroundImage: NetworkImage(barberShop.imageUrl),
+                          ),
+                          title: Text(barberShop.name),
+                          subtitle: Text(barberShop.location),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
         ListView.builder(
           reverse: true,
-          itemCount: 2,
+          itemCount: barberShops.length,
           itemBuilder: (BuildContext context, int index) {
-            if (index == 0) {
-              return Align(
-                alignment: Alignment.centerRight,
-                child: Container(
-                  margin: const EdgeInsets.all(8.0),
-                  padding: const EdgeInsets.all(8.0),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.primary,
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                  child: Text(
-                    'OK',
-                    style: theme.textTheme.bodyText1!
-                        .copyWith(color: theme.colorScheme.onPrimary),
-                  ),
-                ),
-              );
-            }
-            return Container();
+            final barberShop = barberShops[index];
+            return ListTile(
+              leading: CircleAvatar(
+                backgroundImage: NetworkImage(barberShop.imageUrl),
+              ),
+              title: Text(barberShop.name),
+              subtitle: Text(barberShop.location),
+            );
+            // if (index == 0) {
+            //   return Align(
+            //     alignment: Alignment.centerRight,
+            //     child: Container(
+            //       margin: const EdgeInsets.all(8.0),
+            //       padding: const EdgeInsets.all(8.0),
+            //       decoration: BoxDecoration(
+            //         color: theme.colorScheme.primary,
+            //         borderRadius: BorderRadius.circular(8.0),
+            //       ),
+            //       child: Text(
+            //         barberShop.name,
+            //         style: theme.textTheme.bodyLarge!
+            //             .copyWith(color: theme.colorScheme.onPrimary),
+            //       ),
+            //     ),
+            //   );
+            // }
+            // return Container();
           },
         ),
       ][currentPageIndex],
     );
   }
+
+  void _getBarberShops() async {
+    final snapshot = await FirebaseDatabase.instance.ref('barbearias').get();
+    final List<BarberShop> barberShops = [];
+
+    if (snapshot.exists) {
+      final data = snapshot.value;
+      var barbersMap = Map<String, dynamic>.from(data as Map);
+
+      barbersMap.forEach((key, value) {
+        final json = Map<String, dynamic>.from(data[key] as Map);
+        barberShops.add(BarberShop.fromMap(json));
+      });
+
+      setState(() => this.barberShops = barberShops);
+    }
+  }
 }
-
-

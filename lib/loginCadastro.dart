@@ -1,16 +1,17 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
 import 'package:barbearia/main.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:path/path.dart';
+import 'package:flutter/material.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(); // Inicializa o Firebase
-  runApp(loginCadastro());
+  runApp(const loginCadastro());
 }
 
 class loginCadastro extends StatelessWidget {
+  const loginCadastro({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -26,11 +27,13 @@ class LoginScreen extends StatelessWidget {
   final _senhaController = TextEditingController();
   final _firebaseAuth = FirebaseAuth.instance;
 
+  LoginScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'Barbearia',
         ),
       ),
@@ -43,7 +46,7 @@ class LoginScreen extends StatelessWidget {
               Container(
                 width: 200,
                 height: 200,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   shape: BoxShape.circle,
                   image: DecorationImage(
                     image: NetworkImage(
@@ -53,31 +56,31 @@ class LoginScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              SizedBox(height: 50),
+              const SizedBox(height: 50),
               Container(
-                child: Text(
+                child: const Text(
                   'Crie sua conta',
                   style: TextStyle(color: Colors.blue, fontSize: 20.0),
                 ),
               ),
-              SizedBox(height: 20),
-              Container(
+              const SizedBox(height: 20),
+              SizedBox(
                 width: 250,
                 child: TextField(
                   controller: _nomeController,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     border: OutlineInputBorder(),
                     hintText: 'Usuário',
                   ),
                 ),
               ),
-              SizedBox(height: 10),
-              Container(
+              const SizedBox(height: 10),
+              SizedBox(
                 width: 250,
                 child: TextField(
                   controller: _senhaController,
                   obscureText: true, // Oculta a senha
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     border: OutlineInputBorder(),
                     hintText: 'Senha',
                   ),
@@ -85,33 +88,29 @@ class LoginScreen extends StatelessWidget {
               ),
               Container(
                 width: 250,
-                margin: EdgeInsets.all(10),
+                margin: const EdgeInsets.all(10),
                 child: TextField(
                   controller: _emailController,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     border: OutlineInputBorder(),
                     hintText: 'Email',
                   ),
                 ),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               ButtonBar(
                 alignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
                   TextButton(
-                    child: const Text(
-                      'Criar Conta',
-                    ),
-                    onPressed: () {
-                      cadastrar(
-                          context); // Passa o contexto para a função cadastrar
-                    },
+                    child: const Text('Criar Conta'),
+                    onPressed: () => cadastrar(context),
                   ),
                   TextButton(
-                      child: const Text('Fazer Login'),
-                      onPressed: () {
-                        main();
-                      }),
+                    child: const Text('Fazer Login'),
+                    onPressed: () {
+                      main();
+                    },
+                  ),
                 ],
               )
             ],
@@ -125,7 +124,9 @@ class LoginScreen extends StatelessWidget {
     try {
       final UserCredential userCredential =
           await _firebaseAuth.createUserWithEmailAndPassword(
-              email: _emailController.text, password: _senhaController.text);
+        email: _emailController.text,
+        password: _senhaController.text,
+      );
 
       await userCredential.user!.updateDisplayName(_nomeController.text);
 
